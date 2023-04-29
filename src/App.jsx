@@ -3,124 +3,188 @@ import star from "./assets/images/icon-arrow.svg";
 import { useForm } from "react-hook-form";
 
 const App = () => {
-  const [day, setDay] = useState("");
-  const [dayValidation, setDayValidation] = useState(false);
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    watch,
+  } = useForm({ mode: "all" });
 
-  const [month, setMonth] = useState("");
-  const [montValidation, setMonthValidation] = useState(false);
+  const currentMonth = watch("month");
 
-  const [year, setYear] = useState("");
-  const [YearValidation, setYearValidation] = useState(false);
+  const [day, setDay] = useState("--");
+  const [month, setMonth] = useState("--");
+  const [year, setYear] = useState("--");
 
-  const handleDayValidation = () => {
-    if (day < 31 && month === 4) {
-      setDayValidation(true);
-      return day - 30;
+  const onSubmit = (data) => {
+    const currentDate = new Date();
+    let extraDay = 0;
+    let extraMonth = 0;
+
+    // Make logic for Month of April and the day limitation 30
+    const invalidApril = (currentDay) => {
+      if (currentDay > 29 && currentMonth == 4) {
+        return false;
+      }
+    };
+
+    // Day Logic
+    if (currentDate.getDate() - data.day > 0) {
+      setDay(currentDate.getDate() - data.day);
+    } else {
+      setDay(Math.abs(currentDate.getDate() - data.day));
     }
-  };
-  const handleMonthValidation = () => {
-    if (month >= 13) {
-      return <span className="error-message">Must be a valid month</span>;
-    }
-    setMonthValidation(true);
-  };
 
-  const handleYearValidation = () => {
-    if (year < 2023 && year > 1900) {
-      setYearValidation(true);
-      return year - 2023;
+    // Month Logic
+    if (currentDate.getMonth() + 1 >= data.month) {
+      // check if the current month is bigger than the birth month
+      // current month is 4 and birth date is 2
+      setMonth(currentDate.getMonth() + 1 - data.month);
+    } else {
+      // check if the current month is smaller than or equal to the birth month
+      // current month is 4 and birth date is 6
+
+      setMonth(12 - Math.abs(currentDate.getMonth() + 1 - data.month));
+      extraMonth--;
     }
+
+    // Year Logic
+    setYear(currentDate.getFullYear() - data.year + extraMonth);
   };
+  // 20 -
 
   return (
     <div className="App">
-      <main className="bg-white p-11 rounded-t-xl rounded-bl-xl rounded-br-[150px]">
+      <main className="bg-white m-3 px-6 py-12  md:p-11 rounded-t-2xl rounded-bl-xl md:rounded-br-[150px] rounded-br-[100px] ">
         {/* Top Part */}
-        <form>
-          <div className="flex gap-6 pr-32 ">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex justify-between md:justify-start gap-3 md:gap-6 ">
             <div>
-              <label className="label" htmlFor="day">
+              <label
+                className={`label ${
+                  errors.day ? "text-primaryLightRed" : "text-primarySmokeyGray"
+                }`}
+                htmlFor="day"
+              >
                 Day
               </label>
               <input
-                max={31}
+                {...register("day", {
+                  required: "Please enter a number",
+                  min: {
+                    value: 1,
+                    message: "Number must be 1 or above",
+                  },
+                  max: {
+                    value: 31,
+                    message: "Number must be below 32",
+                  },
+                })}
                 placeholder="DD"
-                className="input"
+                className={`input ${
+                  errors.day ? "focus:border-primaryLightRed" : ""
+                }`}
                 type="day"
                 name="day"
                 id="day"
-                defaultValue={"DD"}
                 required
-                value={day}
-                onChange={(e) => setDay(e.target.value)}
               />
-              {day > 31 ? (
-                <span className="error-message">Must be a valid day</span>
-              ) : (
-                ""
-              )}
+
+              <span className="error-message">{errors.day?.message}</span>
             </div>
             <div>
-              <label className="label" htmlFor="">
+              <label
+                className={`label ${
+                  errors.month
+                    ? "text-primaryLightRed"
+                    : "text-primarySmokeyGray"
+                }`}
+                htmlFor="month"
+              >
                 Month
               </label>
               <input
+                {...register("month", {
+                  required: "Please enter a number",
+                  min: {
+                    value: 1,
+                    message: "Number must be 1 or above",
+                  },
+                  max: {
+                    value: 12,
+                    message: "Number must be below 12",
+                  },
+                })}
                 placeholder="MM"
-                className="input"
+                className={`input ${
+                  errors.month ? "focus:border-primaryLightRed" : ""
+                }`}
                 type="month"
                 name="month"
                 id="day"
-                value={month}
-                onChange={(e) => setMonth(e.target.value)}
               />
-              {month >= 13 ? (
-                <span className="error-message">Must be a valid day</span>
-              ) : (
-                ""
-              )}
+              <span className="error-message">{errors.month?.message}</span>
             </div>
             <div>
-              <label className="label" htmlFor="">
+              <label
+                className={`label ${
+                  errors.year
+                    ? "text-primaryLightRed"
+                    : "text-primarySmokeyGray"
+                }`}
+                htmlFor="year"
+              >
                 Year
               </label>
               <input
+                {...register("year", {
+                  required: "Please enter a number",
+                  min: {
+                    value: 1900,
+                    message: "Year must not be too old",
+                  },
+                  max: {
+                    value: new Date().getFullYear(),
+                    message: "Year must be in the past",
+                  },
+                })}
                 placeholder="YYYY"
-                className="input"
+                className={`input ${
+                  errors.year ? "focus:border-primaryLightRed" : ""
+                }`}
                 type="year"
                 name="year"
                 id="day"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
               />
-              {year > 2023 ? (
-                <span className="error-message">Must be a valid year</span>
-              ) : (
-                ""
-              )}
+
+              <span className="error-message">{errors.year?.message}</span>
             </div>
+          </div>
+
+          {/* Line Part */}
+          <div className="md:py-10 py-14 relative">
+            <hr />
+            <button
+              type="submit"
+              className="absolute hover:bg-black flex w-16 h-16 bg-primaryPurple p-4 text-center rounded-full top-[50%] md:right-[0] right-[50%] transform translate-x-1/2 -translate-y-1/2 "
+            >
+              <img src={star} alt="star" />
+            </button>
           </div>
         </form>
 
-        {/* Line Part */}
-        <div className="py-10 relative">
-          <hr />
-          <button className="absolute hover:bg-black flex w-16 h-16 bg-primaryPurple p-4 text-center rounded-full top-[50%] right-[0] transform -translate-x-0 -translate-y-1/2 ">
-            <img src={star} alt="star" />
-          </button>
-        </div>
-
         {/* Bottom Part */}
-        <div className="italic font-extrabold text-8xl grid gap-2">
+        <div className="italic font-extrabold md:text-8xl text-5xl grid gap-2">
           <p>
-            <span className="text-primaryPurple">-- </span>
+            <span className="text-primaryPurple">{year} </span>
             years
           </p>
           <p>
-            <span className="text-primaryPurple">-- </span>
+            <span className="text-primaryPurple">{month} </span>
             months
           </p>
           <p>
-            <span className="text-primaryPurple">-- </span>
+            <span className="text-primaryPurple">{day} </span>
             days
           </p>
         </div>

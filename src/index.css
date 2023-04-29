@@ -20,11 +20,11 @@ body {
 }
 
 .label {
-  @apply uppercase pb-1 tracking-widest block text-primarySmokeyGray;
+  @apply uppercase pb-1 text-sm font-extrabold tracking-widest block;
 }
 
 .input {
-  @apply w-32 h-14 font-bold text-2xl outline-none p-4 active:border-primaryPurple focus:border-primaryPurple rounded-md border-[.8px] border-gray-300;
+  @apply w-[100%] h-12 px-3 md:p-4 md:w-32 md:h-14 font-bold text-xl md:text-2xl outline-none  active:border-primaryPurple focus:border-primaryPurple rounded-md border-[.8px] border-gray-300;
 }
 
 .error-message {
