@@ -10,7 +10,8 @@ const App = () => {
     watch,
   } = useForm({ mode: "all" });
 
-  const currentMonth = watch("month");
+  const monthInput = watch("month");
+  const dayInput = watch("day");
 
   const [day, setDay] = useState("--");
   const [month, setMonth] = useState("--");
@@ -20,13 +21,6 @@ const App = () => {
     const currentDate = new Date();
     let extraDay = 0;
     let extraMonth = 0;
-
-    // Make logic for Month of April and the day limitation 30
-    const invalidApril = (currentDay) => {
-      if (currentDay > 29 && currentMonth == 4) {
-        return false;
-      }
-    };
 
     // Day Logic
     if (currentDate.getDate() - data.day > 0) {
@@ -52,6 +46,12 @@ const App = () => {
     setYear(currentDate.getFullYear() - data.year + extraMonth);
   };
   // 20 -
+
+  const isEqual = (v) => {
+    const dayLogic = Number(v) !== 31;
+    const monthLogic = Number(monthInput) !== 4;
+    return dayLogic || monthLogic;
+  };
 
   return (
     <div className="App">
@@ -79,6 +79,7 @@ const App = () => {
                     value: 31,
                     message: "Number must be below 32",
                   },
+                  validate: (v) => isEqual(v) || "April only has 30 days",
                 })}
                 placeholder="DD"
                 className={`input ${
@@ -166,7 +167,7 @@ const App = () => {
             <hr />
             <button
               type="submit"
-              className="absolute hover:bg-black flex w-16 h-16 bg-primaryPurple p-4 text-center rounded-full top-[50%] md:right-[0] right-[50%] transform translate-x-1/2 -translate-y-1/2 "
+              className="absolute hover:bg-black flex w-16 h-16 bg-primaryPurple p-4 text-center rounded-full top-[50%] md:right-[20px] right-[50%] transform translate-x-1/2 -translate-y-1/2 "
             >
               <img src={star} alt="star" />
             </button>
